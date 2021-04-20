@@ -1,0 +1,22 @@
+.--flex{
+    display: flex;
+}
+.--collumn{
+    flex-direction: column-reverse;
+}
+.--full-width{
+    width: 100%;
+}
+.--justify-end{
+    justify-content: flex-end;
+}
+.--align-center{
+    align-items: center;
+}
+.--centerlize{
+    align-items: center;
+    justify-content: center;
+}
+.--smoth-bg{
+    transition: color .2s ease-in-out, fill .2s ease-in-out, background-color .2s ease-in-out;
+}
