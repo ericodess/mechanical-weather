@@ -1,8 +1,11 @@
+//Components
+import { Page } from '../components';
+
 const Weather = () => {
     return(
-        <div>
-
-        </div>
+        <Page>
+            Weather
+        </Page>
     );
 };
 

@@ -1,8 +1,11 @@
+//Components
+import { Page } from '../components';
+
 const Settings = () => {
     return(
-        <div>
-
-        </div>
+        <Page>
+            Settings
+        </Page>
     );
 };
 
