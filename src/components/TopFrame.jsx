@@ -1,3 +1,8 @@
+//Components
+import {
+    SVGButton
+} from '../components';
+
 //Images
 import {
     closeIcon,
@@ -13,26 +18,22 @@ const TopFrame = () => {
         window.minimize();
     };
 
-    const closeWindows = () => {
+    const closeWindow = () => {
         const window = electron.remote.getCurrentWindow();
 
         window.close();
     };
     
     return(
-        <nav className="topframe --flex --column --full-width --justify-end --align-center">
-            <button
-                className="--flex --centerlize --smoth-bg"
+        <nav className="topframe --flex --row --full-width --justify-end --centralize-horiz">
+            <SVGButton
                 onClick={minimizeWindow}
-            >
-                {minusIcon}
-            </button>
-            <button
-                className="--flex --centerlize --smoth-bg"
-                onClick={closeWindows}
-            >
-                {closeIcon}
-            </button>
+                inlineSVG={minusIcon}
+            />
+            <SVGButton
+                onClick={closeWindow}
+                inlineSVG={closeIcon}
+            />
         </nav>
     );
 };
