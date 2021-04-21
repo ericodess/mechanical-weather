@@ -3,11 +3,12 @@
 @import 'base/fonts';
 
 //Components Import
-
-//Pages Import
+@import 'components/navbar';
 @import 'components/top-frame';
+@import 'components/weather-status';
 
 //Themes Import
+@import 'themes/default';
 
 //Layout Import
 @import 'layout/mods';

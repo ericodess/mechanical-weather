@@ -1,0 +1,63 @@
+.navbar{
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 100%;
+    background-color: transparent;
+
+    &__list{
+        & .--active{
+            background-color: rgba(7, 26, 82, 1);
+            align-self: flex-start;
+            width: 100%;
+
+            & svg{
+                fill: #A7FF83;
+            }
+        }
+    }
+    &__link{
+        background-color: rgba(7, 26, 82, .1);
+        align-self: center;
+
+        &-dummy{
+            background-color: transparent;
+        }
+        & svg{
+            fill: #086972;
+        }
+    }
+}
+@media (min-width: 801px){
+    .navbar{
+        width: 6.5vh;
+
+        &__list{
+            gap: 1vh 0;
+
+            & .--active{
+                height: 6.5vh;
+                border-radius: 0 1.5vh 1.5vh 0;
+
+                & svg{
+                    width: 4vh;
+                    height: 4vh;
+                }
+            }
+        }
+        &__link{
+            width: 4.5vh;
+            height: 4.5vh;
+            border-radius: 1.5vh;
+
+            & svg{
+                width: 2.5vh;
+                height: 2.5vh;
+            }
+            &-dummy{
+                width: 4.5vh;
+                height: 4.5vh;
+            }
+        }
+    }
+}

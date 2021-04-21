@@ -1,22 +1,31 @@
 .--flex{
     display: flex;
 }
-.--collumn{
-    flex-direction: column-reverse;
+.--column{
+    flex-direction: column;
+}
+.--row{
+    flex-direction: row;
 }
 .--full-width{
     width: 100%;
 }
+.--full-height{
+    height: 100%;
+}
 .--justify-end{
     justify-content: flex-end;
 }
-.--align-center{
+.--centralize{
+    justify-content: center;
     align-items: center;
 }
-.--centerlize{
+.--centralize-horiz{
     align-items: center;
+}
+.--centralize-vert{
     justify-content: center;
 }
-.--smoth-bg{
+.--smooth-bg{
     transition: color .2s ease-in-out, fill .2s ease-in-out, background-color .2s ease-in-out;
 }
