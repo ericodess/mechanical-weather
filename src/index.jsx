@@ -2,6 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+
+//Reducers
+import allReducers from './reducers';
 
 //Components
 import App from './App';
@@ -9,10 +14,14 @@ import App from './App';
 //Styles
 import './assets/sass/main.scss';
 
+const myStore = createStore(allReducers);
+
 ReactDOM.render(
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>,
+    <Provider store={myStore}>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </Provider>,
     document.getElementById('root')
 );
 
