@@ -9,7 +9,7 @@ const NavLink = (props) => {
         );
     }else{
         return(
-            <li className={"navbar__link --smooth-bg" + (currentPage === props.href ? ' --active' : '')}>
+            <li className={"navbar__link --smooth-transition" + (currentPage === props.href ? ' --active' : '')}>
                 <Link
                     className="--full-width --full-height --flex --centralize"
                     to={props.href}

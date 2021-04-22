@@ -1,3 +1,5 @@
+export {default as DropdownList} from './DropdownList';
+export { default as InfoDiplay } from './InfoDisplay';
 export {default as Navbar} from './Navbar';
 export {default as NavLink} from './NavLink';
 export {default as NavList} from './NavList';

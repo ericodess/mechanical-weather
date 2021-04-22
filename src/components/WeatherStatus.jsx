@@ -1,25 +1,42 @@
+import { useSelector } from 'react-redux';
+
+//Icons
 import {
     clearDayIcon,
     clearNightIcon,
     cloudIcon,
     cloudyDayIcon,
     cloudyNightIcon,
-    rainingIcon
+    rainingIcon,
+    unknownIcon
 } from '../assets/images/icons';
 
+const electron = window.require('electron');
+
+const availableStatusList = {
+    "clearDay": clearDayIcon,
+    "clearNigth": clearNightIcon,
+    "cloudy": cloudIcon,
+    "cloudyDay": cloudyDayIcon,
+    "cloudyNight": cloudyNightIcon,
+    "raining": rainingIcon,
+    "unknown": unknownIcon
+};
+
 const WeatherStatus = () => {
-    const availableStatusList = [
-        clearDayIcon,
-        clearNightIcon,
-        cloudIcon,
-        cloudyDayIcon,
-        cloudyNightIcon,
-        rainingIcon
-    ];
+    const getWeatherInfo = () => {
+        const weatherInfo = electron.ipcRenderer.sendSync('get-weather-info', selectedPortInfo.path);
+
+        return weatherInfo;
+    };
+
+    const selectedPortInfo = useSelector(state => state.portInfo),
+          weatherInfo = selectedPortInfo.path ?  getWeatherInfo() : "unknown";
+
 
     return(
         <div className="weather-status --full-width  --flex --centralize">
-            {availableStatusList[0]}
+            {availableStatusList[weatherInfo]}
         </div>
     );
 };
