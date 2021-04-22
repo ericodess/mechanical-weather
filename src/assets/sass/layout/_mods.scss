@@ -19,6 +19,7 @@
 .--centralize{
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 .--centralize-horiz{
     align-items: center;
@@ -26,6 +27,6 @@
 .--centralize-vert{
     justify-content: center;
 }
-.--smooth-bg{
-    transition: color .2s ease-in-out, fill .2s ease-in-out, background-color .2s ease-in-out;
+.--smooth-transition{
+    transition: color .25s ease-in-out, fill .25s ease-in-out, background-color .25s ease-in-out, opacity .25s ease-in-out;
 }

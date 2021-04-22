@@ -9,5 +9,9 @@
 @media (min-width: 801px){
     .weather-status{
         height: 6.5vh;
+
+        & svg{
+            fill: #071A52;
+        }
     }
 }

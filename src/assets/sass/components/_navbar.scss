@@ -1,12 +1,13 @@
 .navbar{
     top: 0;
     left: 0;
-    position: absolute;
     height: 100%;
     background-color: transparent;
+    position: absolute;
 
     &__list{
         & .--active{
+            pointer-events: none;
             background-color: rgba(7, 26, 82, 1);
             align-self: flex-start;
             width: 100%;
@@ -33,7 +34,7 @@
         width: 6.5vh;
 
         &__list{
-            gap: 1vh 0;
+            gap: 1.1vh 0;
 
             & .--active{
                 height: 6.5vh;
@@ -50,6 +51,11 @@
             height: 4.5vh;
             border-radius: 1.5vh;
 
+            &:hover, :focus, :active{
+                outline: none;
+                border-radius: 1.5vh;
+                background-color: rgba(7, 26, 82, .16);
+            }
             & svg{
                 width: 2.5vh;
                 height: 2.5vh;
