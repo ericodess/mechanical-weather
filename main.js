@@ -1,4 +1,8 @@
-const {app, BrowserWindow} = require('electron');
+const {
+    app,
+    BrowserWindow,
+    ipcMain
+} = require('electron');
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
@@ -23,6 +27,53 @@ app.whenReady().then(() => {
         if(BrowserWindow.getAllWindows().length === 0){
             createWindow();
         };
+    });
+});
+
+const SerialPort = require('serialport');
+
+ipcMain.on('get-port-list', async (event, arg) => {
+    await SerialPort.list()
+    .then((ports, err) => {
+        if(err){
+            event.returnValue = [];
+        }else{
+            event.returnValue = ports;
+        };
+    })
+    .catch(error => {
+        event.returnValue = [];
+    })
+});
+
+ipcMain.on('get-port-info', async (event, portPath) => {
+    await SerialPort.list()
+    .then((ports, err) => {
+        if(err){
+            event.returnValue = {};
+        }else{   
+            ports.forEach(port => {
+                if(port.path === portPath){
+                    event.returnValue = port;
+                };
+            });
+        };
+    })
+    .catch(() => {
+        event.returnValue = {};
+    })
+})
+
+ipcMain.on('get-weather-info', (event, portPath) => {
+    const port = new SerialPort(portPath, {
+        baudRate: 9600
+    }),
+        parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
+    
+    parser.on('data', (data) => {
+        const serialData = JSON.parse(data);
+
+        event.returnValue = "clearDay";
     });
 });
 
