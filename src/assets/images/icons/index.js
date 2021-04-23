@@ -5,8 +5,10 @@ export {default as minusIcon} from './helpers/minus';
 export {default as unknownIcon} from './helpers/unknown';
 
 //Navbar Icons
+export {default as displayIcon} from './navbar/display';
 export {default as settingsIcon} from './navbar/settings';
 export {default as temperatureIcon} from './navbar/temperature';
+export {default as usbIcon} from './navbar/usb';
 
 //Weather Icons
 export {default as clearDayIcon} from './weather/clear-day';
