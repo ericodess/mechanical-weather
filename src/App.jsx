@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    Redirect,
     Route,
     Switch
 } from 'react-router-dom';
@@ -28,13 +29,14 @@ const App = () => {
             <main>
                 <Switch>
                     <Route
-                        exact path='/'
-                        component={Weather}
-                    />
-                    <Route
-                        exact path='/settings'
+                        exact path='/settings/:page'
                         component={Settings}
                     />
+                    <Route
+                        exact path='/weather'
+                        component={Weather}
+                    />
+                    <Redirect to="/weather" />              
                 </Switch>
             </main>
         </React.Fragment>
