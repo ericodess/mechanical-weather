@@ -5,13 +5,16 @@
 //Components Import
 @import 'components/dropdown';
 @import 'components/info-display';
+@import 'components/loader';
 @import 'components/navbar';
-@import 'components/page';
 @import 'components/top-frame';
 @import 'components/weather-status';
+
+//Layout Import
+@import 'layout/mods';
 
 //Themes Import
 @import 'themes/default';
 
-//Layout Import
-@import 'layout/mods';
+//Views
+@import 'views/settings';

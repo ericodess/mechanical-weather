@@ -1,4 +1,6 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 //Components
 import {
@@ -7,14 +9,26 @@ import {
     Page
 } from '../components';
 
+//Icons
+import {
+    displayIcon,
+    usbIcon
+} from '../assets/images/icons';
+
 //Actions
-import { updatePortInfo } from '../actions';
+import {
+    updatePortInfo,
+    updateScreenResolution
+} from '../actions';
 
 const electron = window.require('electron');
 
-const Settings = () => {
-    const selectedPortInfo = useSelector(state => state.portInfo),
-          fetchedList = electron.ipcRenderer.sendSync('get-port-list');
+const Settings = (props) => {
+    const state = useSelector(state => state),
+          fetchedList = electron.ipcRenderer.sendSync('get-port-list'),
+          currentPathname = props.location.pathname.split('/')[props.location.pathname.split('/').length - 1],
+          resolutionList = ['1600x900', '1280x720'],
+          selectedOption = currentPathname === 'port' ? state.portInfo.path : state.screenResolution.resolution;
           
     const generatePortList = () => {
         const newPortList = [];
@@ -37,18 +51,66 @@ const Settings = () => {
         return updatePortInfo(port);
     };
 
+    const fetchPortInfo = (portPath) => {
+        let portInfo = {};
+
+        if(portPath){
+            portInfo = electron.ipcRenderer.sendSync('get-port-info', portPath);
+        };
+
+        return portInfo;
+    };
+    
     return(
-        <Page>
-            <DropdownList
-                options={generatePortList()}
-                action={insertPortInfo}
-            />
-            <InfoDiplay
-                info={selectedPortInfo.path ? electron.ipcRenderer.sendSync('get-port-info', selectedPortInfo.path) : {}}
-                errorMessage="Escolha uma porta"
-            />
+        <Page column>
+            <div className="--flex --row --full-width --centralize">
+                {currentPathname === 'port' ? 
+                    <React.Fragment>
+                        <DropdownList
+                            options={generatePortList()}
+                            action={insertPortInfo}
+                            defaultValue="Selecione uma porta"
+                            selectedOption={selectedOption}
+                        />
+                        <InfoDiplay
+                            info={fetchPortInfo(state.portInfo.path)}
+                            errorMessage="Escolha uma porta"
+                        />
+                    </React.Fragment>
+                :
+                    <React.Fragment>
+                        <DropdownList
+                            options={resolutionList}
+                            action={updateScreenResolution}
+                            defaultValue="Selecione uma resolução"
+                            selectedOption={selectedOption}
+                        />
+                        <InfoDiplay
+                            info={{screenResolution: state.screenResolution.resolution}}
+                            errorMessage="Escolha uma resolução"
+                        />
+                    </React.Fragment>
+                }
+            </div>
+            <ul className="settings-menu --flex --row --centralize-vert">
+                <li>
+                    <Link
+                        className={currentPathname === 'port' ? '--flex --centralize --active' : '--flex --centralize'}
+                        to="/settings/port"
+                    >
+                        {usbIcon}
+                    </Link>
+                </li>
+                <li>
+                    <Link
+                        className={currentPathname === 'display' ? '--flex --centralize --active' : '--flex --centralize'}
+                        to="/settings/display"
+                    >
+                        {displayIcon}
+                    </Link>
+                </li>
+            </ul>
         </Page>
-    );
-};
+    )};
 
 export default Settings;

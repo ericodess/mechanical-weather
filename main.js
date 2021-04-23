@@ -23,7 +23,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
     createWindow();
     
-    app.on('activate', function () {
+    app.on('activate', () => {
         if(BrowserWindow.getAllWindows().length === 0){
             createWindow();
         };
@@ -62,22 +62,37 @@ ipcMain.on('get-port-info', async (event, portPath) => {
     .catch(() => {
         event.returnValue = {};
     })
-})
-
-ipcMain.on('get-weather-info', (event, portPath) => {
-    const port = new SerialPort(portPath, {
-        baudRate: 9600
-    }),
-        parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
-    
-    parser.on('data', (data) => {
-        const serialData = JSON.parse(data);
-
-        event.returnValue = "clearDay";
-    });
 });
 
-app.on('window-all-closed', function () {
+ipcMain.on('get-weather-info', async (event, portPath) => {
+    if(portPath){
+        const port = new SerialPort(portPath, {
+            autoOpen: false,
+            baudRate: 9600
+        }),
+            parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
+        
+        
+        port.open((error) => {
+            if(error){
+                console.log(error.message)
+                event.returnValue = "unknown";   
+            }else{
+                parser.on('data', (data) => {
+                    const serialData = JSON.parse(data);
+                    
+                    console.log(serialData)
+        
+                    event.returnValue = "clearDay";
+                });   
+            };
+        });
+    }else{
+        event.returnValue = "unknown";
+    };
+});
+
+app.on('window-all-closed', () => {
     if(process.platform !== 'darwin'){
         app.quit();
     };
