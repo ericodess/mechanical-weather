@@ -18,11 +18,11 @@ const Navbar = () => {
             <NavList>
                 <NavLink dummy/>
                 <NavLink
-                    href='/'
+                    href='/weather'
                     content={temperatureIcon}
                 />
                 <NavLink
-                    href='/settings'
+                    href='/settings/port'
                     content={settingsIcon}
                 />
             </NavList>

@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import {
-    useDispatch,
-    useSelector
-} from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 //Icons
 import {
@@ -17,9 +14,7 @@ import {
 
 const DropdownList = (props) => {
     const dispatch = useDispatch(),
-          selectedPortInfo = useSelector(state => state.portInfo);
-
-    const [selectedOption, setSelectedOption] = useState(selectedPortInfo.path ? selectedPortInfo.path : 'Selecione uma porta'),
+          [selectedOption, setSelectedOption] = useState(props.selectedOption ? props.selectedOption : props.defaulValue),
           [isListActive, setIsListActive] = useState(false),
           { options } = props;
 
@@ -66,7 +61,7 @@ const DropdownList = (props) => {
                 className="dropdown__header --flex --row --centralize --smooth-transition"
                 onClick = {displayOptionListHandler}
             >
-                <span className="dropdown__selected">{selectedOption}</span>
+                <span className="dropdown__selected">{props.selectedOption}</span>
                 {arrowIcon}
             </div>
             <ul
@@ -76,7 +71,7 @@ const DropdownList = (props) => {
                 {options.map((option, i) => {
                     return(
                         <li
-                            className={option === selectedOption ? 'dropdown__option --flex --centralize --smooth-transition --active' :
+                            className={option === props.selectedOption ? 'dropdown__option --flex --centralize --smooth-transition --active' :
                             'dropdown__option --flex --centralize --smooth-transition'}
                             key={i}
                             onClick={() => updatedSelectedOption(option)}
