@@ -24,14 +24,8 @@ const availableStatusList = {
 };
 
 const WeatherStatus = () => {
-    const getWeatherInfo = () => {
-        const weatherInfo = electron.ipcRenderer.sendSync('get-weather-info', selectedPortInfo.path);
-
-        return weatherInfo;
-    };
-
     const selectedPortInfo = useSelector(state => state.portInfo),
-          weatherInfo = selectedPortInfo.path ?  getWeatherInfo() : "unknown";
+          weatherInfo = selectedPortInfo.path ?  electron.ipcRenderer.sendSync('get-weather-info', selectedPortInfo.path) : "unknown";
 
 
     return(
