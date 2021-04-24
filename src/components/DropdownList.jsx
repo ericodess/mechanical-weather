@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+    useState,
+    useEffect
+} from 'react';
 import { useDispatch } from 'react-redux';
 
 //Icons
@@ -14,9 +17,13 @@ import {
 
 const DropdownList = (props) => {
     const dispatch = useDispatch(),
-          [selectedOption, setSelectedOption] = useState(props.selectedOption ? props.selectedOption : props.defaulValue),
+          [selectedOption, setSelectedOption] = useState(props.selectedOption !== null && props.selectedOption !== undefined && props.selectedOption !== '' ? props.selectedOption : props.defaultValue),
           [isListActive, setIsListActive] = useState(false),
           { options } = props;
+    
+    useEffect(() => {
+        setSelectedOption(props.selectedOption !== null && props.selectedOption !== undefined && props.selectedOption !== '' ? props.selectedOption : props.defaultValue)
+    },[props.selectedOption, props.defaultValue]);
 
     const showOptionList = () => {
         const dropdownElement = document.getElementsByClassName('dropdown')[0];
@@ -61,7 +68,7 @@ const DropdownList = (props) => {
                 className="dropdown__header --flex --row --centralize --smooth-transition"
                 onClick = {displayOptionListHandler}
             >
-                <span className="dropdown__selected">{props.selectedOption}</span>
+                <span className="dropdown__selected">{selectedOption}</span>
                 {arrowIcon}
             </div>
             <ul
