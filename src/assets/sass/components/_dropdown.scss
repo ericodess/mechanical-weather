@@ -41,7 +41,7 @@
 }
 @media (min-width: 801px){
     .dropdown{
-        width: 35vh;
+        min-width: 35vh;
         margin: 18vh 0 0 0;
         gap: 1.5vh 0;
 
@@ -59,11 +59,16 @@
                 width: 2vh;
                 height: 2vh;
             }
+            & span{
+                margin: 0 2vh 0 2vh;
+            }
         }
         &__selected{
             margin: 0 0 0 2vh;
+            font-size: 2vh;
         }
         &__options{
+            font-size: 1.8vh;
             border-radius: 1.5vh;
             box-shadow: .2vh .2vh .6vh #c0cfd0,
                         -.2vh -.2vh .6vh #ffffff;
