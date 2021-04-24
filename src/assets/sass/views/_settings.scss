@@ -3,6 +3,10 @@
     bottom: 0;
     width: 100%;
     font-family: 'Roboto-Bold';
+
+    & svg{
+        fill: #071A52;
+    }
 }
 @media (min-width: 801px){
     .settings-menu{
