@@ -6,49 +6,67 @@ const {
 
 const fs = require('fs');
 
-const generaConfigFile = (appName, fileName, configPayload) => {
+const generateAppFile = (appName, subDirectoryPath, fileName, fileExtension, payload) => {
     const currentSystem = process.platform,
-          configFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\Config\\` : `${process.env.HOME}/${appName}/Config/`;
+          sanatizedSubSirectoryPath = filePathSanitizer(subDirectoryPath, ['\\','/']),
+          appFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\${sanatizedSubSirectoryPath}\\` : `${process.env.HOME}/${appName}/${sanatizedSubSirectoryPath}/`,
+          filePath = `${appFilePath}${fileName}.${filePathSanitizer(fileExtension.toLowerCase(),['.'])}`;
 
-    if(!fs.existsSync(configFilePath)){
-        fs.mkdirSync(configFilePath, {recursive: true});
+    if(!fs.existsSync(appFilePath)){
+        fs.mkdirSync(appFilePath, {recursive: true});
     };
 
-    fs.writeFileSync(`${configFilePath}${fileName}.json`, JSON.stringify(configPayload, null, "\t"));
-
-    return configFilePath;
+    fs.writeFileSync(filePath, JSON.stringify(payload, null, "\t"));
 };
 
-const readConfigFile = (appName) => {
+const readAppFile = (appName, subDirectoryPath, fileName, fileExtension) => {
     return new Promise((resolve, reject) => {
         const currentSystem = process.platform,
-          configFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\Config\\` : `${process.env.HOME}/${appName}/Config/`;
+              sanatizedSubSirectoryPath = filePathSanitizer(subDirectoryPath, ['\\','/']),
+              appFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\${sanatizedSubSirectoryPath}\\` : `${process.env.HOME}/${appName}/${sanatizedSubSirectoryPath}/`,
+              filePath = `${appFilePath}${fileName}.${filePathSanitizer(fileExtension.toLowerCase(),['.'])}`;
 
-        let configPayload = {};
-
-        if(fs.existsSync(configFilePath)){
-            fs.readFile(`${configFilePath}ClientConfiguration.json`, (err, data) => {
+        if(fs.existsSync(filePath)){
+            fs.readFile(filePath, (err, data) => {
                 if(err){
                     reject(err);
                 };
 
                 resolve(JSON.parse(data));
             });
+        }else{
+            resolve(-1);
         };
-
-        return configPayload;
     })
+};
+
+const filePathSanitizer = (filePath, targetList) => {
+    let sanitizedFilePath = filePath;
+
+    if(sanitizedFilePath !== null && sanitizedFilePath !== undefined && sanitizedFilePath !== ''){
+        targetList.forEach((target, index) => {
+            if(sanitizedFilePath[0] === target){
+                sanitizedFilePath = sanitizedFilePath.substring(1);
+            };
+    
+            if(sanitizedFilePath[sanitizedFilePath.length - 1] === target){
+                sanitizedFilePath = sanitizedFilePath.slice(0, -1);
+            };
+        });
+    };
+
+    return sanitizedFilePath;
 };
 
 const createWindow = async () => {
     let configPayload = {};
 
-    await readConfigFile('MechanicalWeather')
+    await readAppFile('MechanicalWeather', 'Config', 'ClientConfiguration', 'json')
     .then(result => configPayload = result)
     
     const mainWindow = new BrowserWindow({
-        width: configPayload.displayResolution ? configPayload.displayResolution.width : 1600,
-        height: configPayload.displayResolution ? configPayload.displayResolution.height : 900,
+        width: configPayload.displayResolution ? configPayload.displayResolution.width : 1280,
+        height: configPayload.displayResolution ? configPayload.displayResolution.height : 720,
         frame: false,
         webPreferences: {
             nodeIntegration: true,
@@ -116,14 +134,36 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
         
         port.open((error) => {
             if(error){
-                console.log(error.message)
                 event.returnValue = "unknown";   
             }else{
-                parser.on('data', (data) => {
+                parser.on('data', async (data) => {
                     const serialData = JSON.parse(data);
+
+                    let payload = {
+                        timeStamp: Date.now(),
+                        weatherInfo: serialData
+                    },
+                        weatherLog;
+
+                    await readAppFile('MechanicalWeather', 'Logs', 'WeatherLogs', 'json')
+                    .then(result => weatherLog = result)
                     
-                    console.log(serialData)
-        
+                    if(weatherLog === -1){
+                        payload = [payload];
+                    }else{
+                        const newWeatherLog = weatherLog;
+                        
+                        while(newWeatherLog.length >= 14){
+                            newWeatherLog.shift();
+                        };
+
+                        newWeatherLog.push(payload);
+
+                        payload = weatherLog;
+                    };
+
+                    generateAppFile('MechanicalWeather', 'Logs', 'WeatherLogs', 'json', payload);
+
                     event.returnValue = "clearDay";
                 });   
             };
@@ -133,8 +173,8 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
     };
 });
 
-ipcMain.on('generate-config-file', (event, config) => {
-    generaConfigFile('MechanicalWeather', 'ClientConfiguration', config);
+ipcMain.on('generate-app-file', (event, subDirectoryPath, fileName, fileExtension, payload) => {
+    generateAppFile('MechanicalWeather', subDirectoryPath, fileName, fileExtension, payload);
 
     event.returnValue = true;
 });
