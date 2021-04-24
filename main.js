@@ -4,10 +4,51 @@ const {
     ipcMain
 } = require('electron');
 
-const createWindow = () => {
+const fs = require('fs');
+
+const generaConfigFile = (appName, fileName, configPayload) => {
+    const currentSystem = process.platform,
+          configFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\Config\\` : `${process.env.HOME}/${appName}/Config/`;
+
+    if(!fs.existsSync(configFilePath)){
+        fs.mkdirSync(configFilePath, {recursive: true});
+    };
+
+    fs.writeFileSync(`${configFilePath}${fileName}.json`, JSON.stringify(configPayload, null, "\t"));
+
+    return configFilePath;
+};
+
+const readConfigFile = (appName) => {
+    return new Promise((resolve, reject) => {
+        const currentSystem = process.platform,
+          configFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\Config\\` : `${process.env.HOME}/${appName}/Config/`;
+
+        let configPayload = {};
+
+        if(fs.existsSync(configFilePath)){
+            fs.readFile(`${configFilePath}ClientConfiguration.json`, (err, data) => {
+                if(err){
+                    reject(err);
+                };
+
+                resolve(JSON.parse(data));
+            });
+        };
+
+        return configPayload;
+    })
+};
+
+const createWindow = async () => {
+    let configPayload = {};
+
+    await readConfigFile('MechanicalWeather')
+    .then(result => configPayload = result)
+    
     const mainWindow = new BrowserWindow({
-        width: 1600,
-        height: 900,
+        width: configPayload.displayResolution ? configPayload.displayResolution.width : 1600,
+        height: configPayload.displayResolution ? configPayload.displayResolution.height : 900,
         frame: false,
         webPreferences: {
             nodeIntegration: true,
@@ -90,6 +131,12 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
     }else{
         event.returnValue = "unknown";
     };
+});
+
+ipcMain.on('generate-config-file', (event, config) => {
+    generaConfigFile('MechanicalWeather', 'ClientConfiguration', config);
+
+    event.returnValue = true;
 });
 
 app.on('window-all-closed', () => {

@@ -60,6 +60,20 @@ const Settings = (props) => {
 
         return portInfo;
     };
+
+    const insertScreenResolution = (option) => {
+        const splittedOption = option.split('x'),
+              configurationPayload = {
+                    displayResolution: {
+                        width: parseInt(splittedOption[0]),
+                        height: parseInt(splittedOption[1])
+                    }
+        };
+        
+        electron.ipcRenderer.sendSync('generate-config-file', configurationPayload);
+
+        return updateScreenResolution(option);
+    };
     
     return(
         <Page column>
@@ -81,7 +95,7 @@ const Settings = (props) => {
                     <React.Fragment>
                         <DropdownList
                             options={resolutionList}
-                            action={updateScreenResolution}
+                            action={insertScreenResolution}
                             defaultValue="Selecione uma resolução"
                             selectedOption={selectedOption}
                         />
