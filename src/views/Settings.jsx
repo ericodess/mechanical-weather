@@ -70,7 +70,7 @@ const Settings = (props) => {
                     }
         };
         
-        electron.ipcRenderer.sendSync('generate-config-file', configurationPayload);
+        electron.ipcRenderer.sendSync('generate-app-file', 'Config', 'ClientConfiguration', 'json', configurationPayload);
 
         return updateScreenResolution(option);
     };
