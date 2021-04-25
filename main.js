@@ -76,6 +76,77 @@ const createWindow = async () => {
     });
     
     mainWindow.loadURL('http://localhost:3000');
+    mainWindow.webContents.openDevTools();
+};
+
+const generateWeatherStatus = (timestamp, temperature, humidity) => {
+    const MIN_DAY_TRESHOLD = 4,
+          MAX_DAY_TRESHOLD = 18;
+    
+    const MIN_MILD_TEMPERATURE_TRESHOLD = 21,
+          MAX_MILD_TEMPERATURE_TRESHOLD = 27;
+
+    const MIN_DAY_HUMIDITY_TRESHOLD = 20,
+          MAX_DAY_HUMIDITY_TRESHOLD = 39,
+          MIN_NIGTH_HUMIDITY_TRESHOLD = 40,
+          MAX_NIGTH_HUMIDITY_TRESHOLD = 55;
+    
+    const availablePrefixes = {
+        weather:{
+            clear: "clear",
+            cloudy: "cloudy",
+            raining: "raining"
+        },
+        time: {
+            day: "Day",
+            night:"Night"
+        }
+    },
+          convertedTime = new Date(timestamp).getHours();
+    
+    let weather, time;
+
+    if(convertedTime >= MIN_DAY_TRESHOLD && convertedTime <= MAX_DAY_TRESHOLD){
+        time = availablePrefixes.time.day;
+    }else{
+        time = availablePrefixes.time.night;
+    };
+
+    if(temperature >= MIN_MILD_TEMPERATURE_TRESHOLD && temperature <= MAX_MILD_TEMPERATURE_TRESHOLD){
+        if(time === "Day"){
+            if(humidity >= MIN_DAY_HUMIDITY_TRESHOLD && humidity <= MAX_DAY_HUMIDITY_TRESHOLD){
+                weather = availablePrefixes.weather.cloudy + time;
+            }else{
+                weather = availablePrefixes.weather.clear + time;
+            };
+        }else{
+            if(humidity >= MIN_NIGTH_HUMIDITY_TRESHOLD && humidity <= MAX_NIGTH_HUMIDITY_TRESHOLD){
+                weather = availablePrefixes.weather.cloudy + time;
+            }else{
+                weather = availablePrefixes.weather.clear + time;
+            };
+        };
+    }else{
+        if(time === "Day"){
+            if(humidity >= MIN_DAY_HUMIDITY_TRESHOLD && humidity <= MAX_DAY_HUMIDITY_TRESHOLD){
+                weather = availablePrefixes.weather.cloudy + time;
+            }else{
+                weather = availablePrefixes.weather.clear + time;
+            };
+        }else{
+            if(humidity >= MIN_NIGTH_HUMIDITY_TRESHOLD && humidity <= MAX_NIGTH_HUMIDITY_TRESHOLD){
+                weather = availablePrefixes.weather.cloudy + time;
+            }else{
+                weather = availablePrefixes.weather.clear + time;
+            };
+        };
+    }
+
+    //if(humidity > MAX_NIGTH_HUMIDITY_TRESHOLD || humidity > MAX_DAY_HUMIDITY_TRESHOLD){
+        //weather = availablePrefixes.weather.raining;
+    //};
+
+    return weather;
 };
 
 
@@ -134,7 +205,9 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
         
         port.open((error) => {
             if(error){
-                event.returnValue = "unknown";   
+                event.returnValue = {
+                    weatherType: "unknown"
+                };   
             }else{
                 parser.on('data', async (data) => {
                     const serialData = JSON.parse(data);
@@ -164,12 +237,20 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
 
                     generateAppFile('MechanicalWeather', 'Logs', 'WeatherLogs', 'json', payload);
 
-                    event.returnValue = "clearDay";
+                    event.returnValue = {
+                        weatherType: generateWeatherStatus(Date.now(), serialData.temperature, serialData.humidity),
+                        weatherInfo: {
+                            temperature: serialData.temperature,
+                            humidity: serialData.humidity
+                        }
+                    };
                 });   
             };
         });
     }else{
-        event.returnValue = "unknown";
+        event.returnValue = {
+            weatherType: "unknown"
+        };
     };
 });
 
@@ -177,6 +258,12 @@ ipcMain.on('generate-app-file', (event, subDirectoryPath, fileName, fileExtensio
     generateAppFile('MechanicalWeather', subDirectoryPath, fileName, fileExtension, payload);
 
     event.returnValue = true;
+});
+
+ipcMain.on('read-app-file', async (event, subDirectoryPath, fileName, fileExtension) => {
+    readAppFile('MechanicalWeather', subDirectoryPath, fileName, fileExtension)
+    .then(result => event.returnValue = result)
+    .catch(() => event.returnValue = [])
 });
 
 app.on('window-all-closed', () => {
