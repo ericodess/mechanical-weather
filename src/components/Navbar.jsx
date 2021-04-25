@@ -22,7 +22,7 @@ const Navbar = () => {
                     content={temperatureIcon}
                 />
                 <NavLink
-                    href='/settings/port'
+                    href='/settings/profile'
                     content={settingsIcon}
                 />
             </NavList>
