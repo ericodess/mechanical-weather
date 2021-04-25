@@ -28,5 +28,25 @@
     justify-content: center;
 }
 .--smooth-transition{
-    transition: color .25s ease-in-out, fill .25s ease-in-out, background-color .25s ease-in-out, opacity .25s ease-in-out;
+    transition: color .25s ease-in-out, fill .25s ease-in-out, background-color .25s ease-in-out, opacity .25s ease-in-out, margin .25s ease-in-out,
+                font-size .25s ease-in-out;
+}
+.--neumorphism{
+    background-color: #E2F3F5;
+    box-shadow: .2vh .2vh .6vh #c0cfd0,
+                -.2vh -.2vh .6vh #ffffff;
+}
+.--borderless{
+    box-shadow: none;
+}
+.--blue-color{
+    color: #071A52;
+}
+.--green-color{
+    color: #17B978;
+}
+@media (min-width: 801px){
+    .--squircle-borders{
+        border-radius: 1.5vh;
+    }
 }

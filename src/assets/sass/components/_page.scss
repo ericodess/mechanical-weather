@@ -1,0 +1,28 @@
+.page{
+    &__text{
+        font-family: 'Roboto-Bold';
+        color: #086972;
+
+        & p{
+            display: flex;
+            flex-direction: row;
+        }
+    }
+}
+@media (min-width: 801px){
+    .page{
+        &__text{
+            margin: 13vh 0 20vh 0;
+            font-size: 6vh;
+            gap: 5vh 0;
+
+            & p{
+                gap: 0 2.2vh;
+            }
+        }
+        &__section{
+            margin: 0 0 8vh 0;
+            gap: 2vh;
+        }
+    }
+}
