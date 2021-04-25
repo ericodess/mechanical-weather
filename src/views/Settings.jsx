@@ -1,29 +1,38 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import {
+    useSelector,
+    useDispatch
+} from 'react-redux';
 import { Link } from 'react-router-dom';
 
 //Components
 import {
     DropdownList,
     InfoDiplay,
-    Page
+    Page,
+    TextInput
 } from '../components';
 
 //Icons
 import {
     displayIcon,
+    profileIcon,
     usbIcon
 } from '../assets/images/icons';
 
 //Actions
 import {
     updatePortInfo,
-    updateScreenResolution
+    updateScreenResolution,
+    updateUsername,
+    updateUserLocation
 } from '../actions';
 
 const electron = window.require('electron');
 
 const Settings = (props) => {
+    const dispatch = useDispatch();
+
     const state = useSelector(state => state),
           fetchedList = electron.ipcRenderer.sendSync('get-port-list'),
           currentPathname = props.location.pathname.split('/')[props.location.pathname.split('/').length - 1],
@@ -75,23 +84,32 @@ const Settings = (props) => {
         return updateScreenResolution(option);
     };
     
-    return(
-        <Page column>
-            <div className="--flex --row --full-width --centralize">
-                {currentPathname === 'port' ? 
-                    <React.Fragment>
-                        <DropdownList
-                            options={generatePortList()}
-                            action={insertPortInfo}
-                            defaultValue="Selecione uma porta"
-                            selectedOption={selectedOption}
-                        />
-                        <InfoDiplay
-                            info={fetchPortInfo(state.portInfo.path)}
-                            errorMessage="Escolha uma porta"
-                        />
-                    </React.Fragment>
-                :
+    const dispatchUsername = () => {
+        const nameInput = document.getElementById('nomeInput');
+
+        if(nameInput && nameInput.value !== ''){
+            dispatch(updateUsername(nameInput.value));
+        };
+    };
+    
+    const dispatchUserLocation = () => {
+        const longitudeInput = document.getElementById('longitudeInput'),
+              latitudeInput = document.getElementById('latitudeInput');
+
+        if(longitudeInput && latitudeInput && longitudeInput.value !== '' && latitudeInput.value !== ''){
+            if(longitudeInput.value && latitudeInput.value){
+                dispatch(updateUserLocation({
+                    latitude: latitudeInput.value,
+                    longitude: longitudeInput.value
+                }))
+            }; 
+        };
+    };
+
+    const setPageRender = () => {
+        switch(currentPathname){
+            case 'display':
+                return(
                     <React.Fragment>
                         <DropdownList
                             options={resolutionList}
@@ -104,9 +122,71 @@ const Settings = (props) => {
                             errorMessage="Escolha uma resolução"
                         />
                     </React.Fragment>
-                }
-            </div>
+                );
+
+            case 'port':
+                return(
+                    <React.Fragment>
+                        <DropdownList
+                            options={generatePortList()}
+                            action={insertPortInfo}
+                            defaultValue="Selecione uma porta"
+                            selectedOption={selectedOption}
+                        />
+                        <InfoDiplay
+                            info={fetchPortInfo(state.portInfo.path)}
+                            errorMessage="Escolha uma porta"
+                        />
+                    </React.Fragment>
+                );
+
+            case 'profile':
+                return(
+                    <React.Fragment>
+                        <TextInput
+                            label="Nome"
+                            onClick={dispatchUsername}
+                        />
+                        <div className="page__section --flex --row">
+                            <TextInput
+                                label="Latitude"
+                                onClick={dispatchUserLocation}
+                            />
+                            <TextInput
+                                label="Longitude"
+                                onClick={dispatchUserLocation}
+                            />
+                        </div>
+                        <InfoDiplay
+                            info={{
+                                userName: state.userInfo.username,
+                                longitude: state.userLocation.longitude,
+                                latitude: state.userLocation.latitude
+                            }}
+                            errorMessage="Insira os dados"
+                        marginLess/>
+                    </React.Fragment>
+                );
+
+            default:
+                return(
+                    <React.Fragment></React.Fragment>
+                );
+        };
+    };
+
+    return(
+        <Page column>
+            {setPageRender()}
             <ul className="settings-menu --flex --row --centralize-vert">
+                <li>
+                    <Link
+                        className={currentPathname === 'profile' ? '--flex --centralize --active' : '--flex --centralize'}
+                        to="/settings/profile"
+                    >
+                        {profileIcon}
+                    </Link>
+                </li>
                 <li>
                     <Link
                         className={currentPathname === 'port' ? '--flex --centralize --active' : '--flex --centralize'}
