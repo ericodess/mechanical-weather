@@ -1,23 +1,34 @@
-//Components
-import { Page } from '../components';
+import { useSelector } from 'react-redux';
 
 //Components
 import {
-    DropdownList,
+    Page,
+    WeatherChart,
     InfoDiplay
 } from '../components';
 
 const Weather = () => {
+    const weatherInfo = useSelector(state => state.weatherInfo),
+          weatherStatus = weatherInfo.weatherInfo ? weatherInfo.weatherInfo : {
+            temperature: "?",
+            humidity: "?"
+          };
+            
     return(
         <Page column>
-            <DropdownList
-                options={['°C', '°F']}
-                action={() => alert('huh')}
-                defaultValue="Selecione uma unidade"
-                selectedOption={null}
-            />
+            <div className="page__text --flex --column">
+                <p>
+                    <span className="--blue-color">{weatherStatus.humidity}</span>
+                    <span>%</span>
+                </p>
+                <p>
+                    <span className="--green-color">{weatherStatus.temperature}</span>
+                    <span>°C</span>
+                </p>
+            </div>
+            
             <InfoDiplay custom>
-                <span>Graph</span>
+                <WeatherChart />
             </InfoDiplay>
         </Page>
     );
