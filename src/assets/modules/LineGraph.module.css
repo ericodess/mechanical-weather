@@ -1,0 +1,10 @@
+.graphContainer {
+
+    background: transparent;
+}
+@media (min-width: 801px){
+    .graphContainer{
+        width: 120vh;
+        height: 30vh;
+    }
+}
