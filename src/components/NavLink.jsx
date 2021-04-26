@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { getSplitIndex } from '../services';
 
 const NavLink = (props) => {
-    const currentPage = getSplitIndex(window.location.pathname, '/', 1);
+    const currentPage = getSplitIndex(getSplitIndex(window.location.hash, '#', 1), '/', 1);
 
     if(props.dummy){
         return(
