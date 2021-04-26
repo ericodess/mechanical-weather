@@ -140,13 +140,15 @@ const WeatherChart = () => {
 
         if(weather && weather.temperature && weather.humidity && weather.temperature !== '?' && weather.humidity !== '?' && userInfo.username && userLocation.longitude && userLocation.latitude && userInfo.username !== '' && userLocation.longitude !== '' && userLocation.latitude !== ''){
             if(!isFetched || (weather.temperature !== weatherLogs.temperatureList[weatherLogs.temperatureList.length - 2] && weather.humidity !== weatherLogs.humidityList[weatherLogs.humidityList.length - 2])){
-                fetch(`${process.env.REACT_APP_CORS}/${process.env.REACT_APP_API_URL}?p=${encodeURI(userInfo.username)}&lat=${userLocation.latitude}&lon=${userLocation.longitude}&t=${weather.temperature}&u=${weather.humidity}`, {
-                    method: 'GET'
-                });
+                if(process.env.REACT_APP_CORS && process.env.REACT_APP_CORS){
+                    fetch(`${process.env.REACT_APP_CORS}/${process.env.REACT_APP_API_URL}?p=${encodeURI(userInfo.username)}&lat=${userLocation.latitude}&lon=${userLocation.longitude}&t=${weather.temperature}&u=${weather.humidity}`, {
+                        method: 'GET'
+                    });
 
-                if(isFetched !== true){
-                    isFetched = true;
-                };
+                    if(isFetched !== true){
+                        isFetched = true;
+                    };
+                }
             };
         }; 
 
