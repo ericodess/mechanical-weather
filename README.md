@@ -1,3 +1,5 @@
+[![mechanical-weather](https://raw.githubusercontent.com/pepeyen/mechanical-weather/master/.github/images/project-thumbnail.png)](https://github.com/pepeyen/mechanical-weather)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
