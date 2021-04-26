@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import {
     useSelector,
     useDispatch
@@ -34,8 +36,12 @@ const WeatherStatus = () => {
           weatherInfo = selectedPortInfo.path ?  electron.ipcRenderer.sendSync('get-weather-info', selectedPortInfo.path) : {},
           weatherStatus = weatherInfo.weatherType ? weatherInfo.weatherType : "unknown";
           
-    dispatch(updateWeatherInfo(weatherInfo));
+    useEffect(() => {
+        dispatch(updateWeatherInfo(weatherInfo));
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    
     return(
         <div className="weather-status --full-width  --flex --centralize">
             {availableStatusList[weatherStatus]}
