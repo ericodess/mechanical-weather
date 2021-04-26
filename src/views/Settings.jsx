@@ -34,7 +34,7 @@ const Settings = (props) => {
     const dispatch = useDispatch();
 
     const state = useSelector(state => state),
-          fetchedList = electron.ipcRenderer.sendSync('get-port-list'),
+          portList = electron.ipcRenderer.sendSync('get-port-list'),
           currentPathname = props.location.pathname.split('/')[props.location.pathname.split('/').length - 1],
           resolutionList = ['1600x900', '1280x720'],
           selectedOption = currentPathname === 'port' ? state.portInfo.path : state.screenResolution.resolution;
@@ -42,7 +42,7 @@ const Settings = (props) => {
     const generatePortList = () => {
         const newPortList = [];
 
-        fetchedList.forEach(port => {
+        portList.forEach(port => {
             newPortList.push(port.path);
         });
 
@@ -50,7 +50,7 @@ const Settings = (props) => {
     };
 
     const insertPortInfo = (option) => {
-        const portInfo = fetchedList.find(currentPort => currentPort.path === option);
+        const portInfo = portList.find(currentPort => currentPort.path === option);
         let port = {};
 
         if(typeof portInfo === 'object'){
