@@ -4,7 +4,9 @@ const {
     ipcMain
 } = require('electron');
 
-const fs = require('fs');
+const fs = require('fs'),
+      path = require('path'),
+      isDev = require('electron-is-dev');
 
 const generateAppFile = (appName, subDirectoryPath, fileName, fileExtension, payload) => {
     const currentSystem = process.platform,
@@ -72,11 +74,15 @@ const createWindow = async () => {
             nodeIntegration: true,
             enableRemoteModule: true,
             contextIsolation: false
-        }
+        },
+        icon: __dirname + '/favicon.ico'
     });
     
-    mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
+    mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+    
+    if(isDev){
+        mainWindow.webContents.openDevTools();
+    };
 };
 
 const generateWeatherStatus = (timestamp, temperature, humidity) => {
@@ -140,11 +146,7 @@ const generateWeatherStatus = (timestamp, temperature, humidity) => {
                 weather = availablePrefixes.weather.clear + time;
             };
         };
-    }
-
-    //if(humidity > MAX_NIGTH_HUMIDITY_TRESHOLD || humidity > MAX_DAY_HUMIDITY_TRESHOLD){
-        //weather = availablePrefixes.weather.raining;
-    //};
+    };
 
     return weather;
 };
@@ -201,8 +203,7 @@ ipcMain.on('get-weather-info', async (event, portPath) => {
             baudRate: 9600
         }),
             parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
-        
-        
+
         port.open((error) => {
             if(error){
                 event.returnValue = {
