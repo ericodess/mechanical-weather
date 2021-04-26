@@ -4,7 +4,7 @@ const electron = window.require('electron');
 const settingsFile = electron.ipcRenderer.sendSync('read-app-file', 'Config', 'ClientConfiguration', 'json');
 
 const screenResolutionReducer = (state = JSON.parse(window.localStorage.getItem("screenResolution")) === null ? {
-    resolution: settingsFile ? `${settingsFile.displayResolution.width}x${settingsFile.displayResolution.height}` : "1280x720"
+    resolution: settingsFile && settingsFile.displayResolution ? `${settingsFile.displayResolution.width}x${settingsFile.displayResolution.height}` : "1280x720"
     } : JSON.parse(window.localStorage.getItem("screenResolution")), action) => {
         
     switch(action.type){
