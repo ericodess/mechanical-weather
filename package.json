@@ -2,7 +2,7 @@
   "name": "mechanical-weather",
   "description": "React/Electron app using Arduino's serial weather data ",
   "author": "Pepeyen",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.10",
