@@ -19,7 +19,7 @@ const Weather = () => {
             <div className="page__text --flex --column">
                 <p>
                     <span className="--blue-color">{weatherStatus.humidity}</span>
-                    <span>%</span>
+                    <span>&nbsp;%</span>
                 </p>
                 <p>
                     <span className="--green-color">{weatherStatus.temperature}</span>
