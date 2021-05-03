@@ -9,7 +9,7 @@ const TextInput = (props) => {
     };
     
     return(
-        <div className="text-input --flex --row --squircle-borders --centralize-horiz">
+        <div className={!props.buttonless ? "text-input --flex --row --squircle-borders --centralize-horiz" : "text-input --flex --row --squircle-borders --centralize-horiz --buttonless"}>
             <input
                 id={`${props.label.toLowerCase()}Input`}
                 className="text-input__input --neumorphism"
@@ -23,12 +23,17 @@ const TextInput = (props) => {
             >
                 {props.label}
             </label>
-            <button
-                className="text-input__button --neumorphism --smooth-transition"
-                onClick={props.onClick}
-            >
-                {enterIcon}
-            </button>
+            {!props.buttonless ?
+                <button
+                    className="text-input__button --neumorphism --smooth-transition"
+                    onClick={props.onClick}
+                    title={props.title ? props.title : null}
+                >
+                    {enterIcon}
+                </button>
+            :
+                null
+            }
         </div>
     );
 };
