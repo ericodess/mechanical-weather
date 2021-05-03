@@ -151,14 +151,17 @@ const Settings = (props) => {
                             label="Nome"
                             onClick={dispatchUsername}
                             title="Atualizar nome"
+                            defaultValue={state.userInfo.username ? state.userInfo.username : ""}
                         />
                         <div className="page__section --flex --column --centralize-horiz">
                             <div className="page__section --flex --row">
                                 <TextInput
                                     label="Latitude"
+                                    defaultValue={state.userLocation.latitude ? state.userLocation.latitude : ""}
                                 buttonless/>
                                 <TextInput
                                     label="Longitude"
+                                    defaultValue={state.userLocation.longitude ? state.userLocation.longitude : ""}
                                 buttonless/>
                             </div>
                             <button
