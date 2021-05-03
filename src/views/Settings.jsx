@@ -17,7 +17,8 @@ import {
 import {
     displayIcon,
     profileIcon,
-    usbIcon
+    usbIcon,
+    enterIcon
 } from '../assets/images/icons';
 
 //Actions
@@ -61,12 +62,15 @@ const Settings = (props) => {
     };
 
     const fetchPortInfo = (portPath) => {
-        let portInfo = {};
+        let portInfo = {},
+            netPortList = generatePortList();
 
-        if(portPath){
-            portInfo = electron.ipcRenderer.sendSync('get-port-info', portPath);
+        if(netPortList.find(port => port === portPath)){
+            if(portPath){
+                portInfo = electron.ipcRenderer.sendSync('get-port-info', portPath);
+            };
         };
-
+        
         return portInfo;
     };
 
@@ -146,22 +150,30 @@ const Settings = (props) => {
                         <TextInput
                             label="Nome"
                             onClick={dispatchUsername}
+                            title="Atualizar nome"
                         />
-                        <div className="page__section --flex --row">
-                            <TextInput
-                                label="Latitude"
+                        <div className="page__section --flex --column --centralize-horiz">
+                            <div className="page__section --flex --row">
+                                <TextInput
+                                    label="Latitude"
+                                buttonless/>
+                                <TextInput
+                                    label="Longitude"
+                                buttonless/>
+                            </div>
+                            <button
+                                className="text-input__button --double-button --neumorphism --smooth-transition --squircle-borders"
+                                title="Atulizar localização"
                                 onClick={dispatchUserLocation}
-                            />
-                            <TextInput
-                                label="Longitude"
-                                onClick={dispatchUserLocation}
-                            />
+                            >
+                                {enterIcon}
+                            </button>
                         </div>
                         <InfoDiplay
                             info={{
                                 userName: state.userInfo.username,
-                                longitude: state.userLocation.longitude,
-                                latitude: state.userLocation.latitude
+                                latitude: state.userLocation.latitude,
+                                longitude: state.userLocation.longitude
                             }}
                             errorMessage="Insira os dados"
                         marginLess/>
@@ -183,6 +195,7 @@ const Settings = (props) => {
                     <Link
                         className={currentPathname === 'profile' ? '--flex --centralize --active' : '--flex --centralize'}
                         to="/settings/profile"
+                        title="Configurações do Usuário"
                     >
                         {profileIcon}
                     </Link>
@@ -191,6 +204,7 @@ const Settings = (props) => {
                     <Link
                         className={currentPathname === 'port' ? '--flex --centralize --active' : '--flex --centralize'}
                         to="/settings/port"
+                        title="Configurações de Porta"
                     >
                         {usbIcon}
                     </Link>
@@ -199,6 +213,7 @@ const Settings = (props) => {
                     <Link
                         className={currentPathname === 'display' ? '--flex --centralize --active' : '--flex --centralize'}
                         to="/settings/display"
+                        title="Configurações de Vídeo"
                     >
                         {displayIcon}
                     </Link>
