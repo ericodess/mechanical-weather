@@ -4,6 +4,10 @@
     width: 100%;
     font-family: 'Roboto-Bold';
 
+    & a:hover, & a:focus, & a:active{
+        outline: none;
+        cursor: pointer;
+    }
     & svg{
         fill: #071A52;
     }
@@ -15,7 +19,7 @@
         align-items: flex-end;
 
 
-        & .--active{
+        & .--active, & a:focus{
             width: 10vh;
             height: 5vh;
             border-top-left-radius: 1.5vh;

@@ -18,6 +18,7 @@ const NavLink = (props) => {
                     to={props.href}
                     rel="noreferrer"
                     target={props.isAnotherWindow ? '_blank' : null}
+                    title={props.title ? props.title : null}
                 >
                     {props.content}
                 </Link>

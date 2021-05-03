@@ -20,10 +20,12 @@ const Navbar = () => {
                 <NavLink
                     href='/weather'
                     content={temperatureIcon}
+                    title="Clima"
                 />
                 <NavLink
                     href='/settings/profile'
                     content={settingsIcon}
+                    title="Configurações"
                 />
             </NavList>
         </nav>

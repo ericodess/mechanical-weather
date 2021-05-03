@@ -38,11 +38,16 @@
     }
 }
 @media (min-width: 801px){
+    .--buttonless{
+        & input{
+            border-radius: 1.5vh;
+        }
+    }
     .text-input{
         font-size: 2vh;
         height: 5vh;
-        margin: 18vh 0 0 0;
-
+        margin: 12vh 0 0 0;
+        
         &__input{
             border-top-left-radius: 1.5vh;
             border-bottom-left-radius: 1.5vh;
@@ -56,7 +61,7 @@
             padding: 0 2vh;
             width: 8vh;
 
-            &:hover, :focus{
+            &:hover, &:focus{
                 box-shadow: inset .2vh .2vh .6vh #c0cfd0,
                             inset -.2vh -.2vh .6vh #ffffff;
             }
