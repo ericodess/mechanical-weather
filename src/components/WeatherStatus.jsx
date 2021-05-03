@@ -36,11 +36,7 @@ const WeatherStatus = () => {
           weatherInfo = selectedPortInfo.path ?  electron.ipcRenderer.sendSync('get-weather-info', selectedPortInfo.path) : {},
           weatherStatus = weatherInfo.weatherType ? weatherInfo.weatherType : "unknown";
           
-    useEffect(() => {
-        dispatch(updateWeatherInfo(weatherInfo));
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    useEffect(() => dispatch(updateWeatherInfo(weatherInfo)));
     
     return(
         <div className="weather-status --full-width  --flex --centralize">
