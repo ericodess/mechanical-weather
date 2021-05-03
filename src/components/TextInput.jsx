@@ -16,6 +16,7 @@ const TextInput = (props) => {
                 type="text"
                 name={`${props.label.toLowerCase()}Input`}
                 onKeyDown={onKeyDownHandler}
+                defaultValue={props.defaultValue}
             required/>
             <label
                 className="text-input__label --smooth-transition"
