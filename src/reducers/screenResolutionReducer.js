@@ -19,7 +19,11 @@ const screenResolutionReducer = (state = JSON.parse(window.localStorage.getItem(
                 const win = electron.remote.getCurrentWindow(),
                       splittedScreenResolution = newState.resolution.split('x');
 
+                win.setMinimumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                win.setMaximumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                
                 win.setSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                
                 win.center();
             };
 

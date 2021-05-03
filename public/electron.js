@@ -67,7 +67,11 @@ const createWindow = async () => {
     .then(result => configPayload = result)
     
     const mainWindow = new BrowserWindow({
+        minWidth: configPayload.displayResolution ? configPayload.displayResolution.width : 1280,
+        maxWidth: configPayload.displayResolution ? configPayload.displayResolution.width : 1280,
         width: configPayload.displayResolution ? configPayload.displayResolution.width : 1280,
+        minHeight: configPayload.displayResolution ? configPayload.displayResolution.height : 720,
+        maxHeight: configPayload.displayResolution ? configPayload.displayResolution.height : 720,
         height: configPayload.displayResolution ? configPayload.displayResolution.height : 720,
         frame: false,
         webPreferences: {
