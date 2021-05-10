@@ -17,7 +17,7 @@
     "win": {
       "icon": "build/icon.ico"
     },
-    "artifactName": "Mecanichal Weather.${ext}",
+    "artifactName": "Mechanical Weather.${ext}",
     "forceCodeSigning": false
   },
   "main": "public/electron.js",
