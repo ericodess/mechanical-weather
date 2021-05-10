@@ -88,10 +88,12 @@ const Settings = (props) => {
     const insertPortInfo = (option) => {
         const portInfo = portList.find(currentPort => currentPort.path === option);
         let port = {};
-        console.log(portInfo)
+
         if(typeof portInfo === 'object'){
             port = portInfo;
         };
+
+        setPortInfo(port);
 
         return updatePortInfo(port);
     };
