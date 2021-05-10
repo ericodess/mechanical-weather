@@ -1,32 +1,12 @@
-const electron = window.require('electron');
+const screenResolutionReducer = (state = JSON.parse(window.localStorage.getItem("screenResolution")) ?? {resolution: "1280x720"}, action) => {
 
-
-const settingsFile = electron.ipcRenderer.sendSync('read-app-file', 'Config', 'ClientConfiguration', 'json');
-
-const screenResolutionReducer = (state = JSON.parse(window.localStorage.getItem("screenResolution")) === null ? {
-    resolution: settingsFile && settingsFile.displayResolution ? `${settingsFile.displayResolution.width}x${settingsFile.displayResolution.height}` : "1280x720"
-    } : JSON.parse(window.localStorage.getItem("screenResolution")), action) => {
-        
     switch(action.type){
         case 'UPDATE_SCREEN_RESOLUTION':
             const newState = {
-                resolution: action.screenResultion
-            };
-
-            window.localStorage.setItem("screenResolution", JSON.stringify(newState));
-
-            if(state.resolution !== newState.resolution){
-                const win = electron.remote.getCurrentWindow(),
-                      splittedScreenResolution = newState.resolution.split('x');
-
-                win.setMinimumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
-                win.setMaximumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
-                
-                win.setSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
-                
-                win.center();
-            };
-
+                    ...state,
+                    resolution: action.screenResultion
+                  };
+            
             return state = newState;
 
         default:
