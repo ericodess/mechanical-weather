@@ -9,15 +9,12 @@ import {
 } from "chart.js";
 import classes  from "../assets/modules/LineGraph.module.css";
 
-
 //Services
 import {
     generateWeatherLogs,
     setChartConfig,
     sendWeatherData
 } from '../services';
-
-const electron = window.require('electron');
 
 //Chart Basic Configuration
 Chart.register(...registerables);
@@ -26,84 +23,91 @@ Chart.register(...registerables);
 Chart.defaults.font.family = "'Roboto-Bold'";
 Chart.defaults.backgroundColor = "transparent";
 
-const getWeatherLogs = () => {
-    const weatherLogs = electron.ipcRenderer.sendSync('read-app-file', 'Logs', 'WeatherLogs', 'json'),
-          newWeatherLogs = generateWeatherLogs(weatherLogs, {
-            timeStampsList: [],
-            temperatureList: [],
-            humidityList: []
-        });
 
-    return newWeatherLogs;
-};
-
-const getChartConfig = () => {
-    const weatherLogs = getWeatherLogs();
-    
-    return setChartConfig(weatherLogs.timeStampsList, weatherLogs.temperatureList, weatherLogs.humidityList);
-};
-
-const initialChartConfig = getChartConfig();
-
-let hasWeatherBeenSent = false;
+const remote = window.require('@electron/remote'),
+      mainProcess = remote.require('./electron.js');
 
 const WeatherChart = () => { 
     const chartRef = React.createRef(null),
           [weatherChart, setWeatherChart] = useState(null),
-          userInfo = useSelector(state => state.userInfo),
-          userLocation = useSelector(state => state.userLocation);
-
-    const weatherLogs = getWeatherLogs();
+          [weatherLogs, setWeatherLogs] = useState({}),
+          weatherInfo = useSelector(state => state.weatherInfo.weatherInfo);
+          
+    const getChartConfig = (newWeatherLogs) => {
+        return setChartConfig(newWeatherLogs.timeStampsList, newWeatherLogs.temperatureList, newWeatherLogs.humidityList);
+    };
+    
+    useEffect(() => {
+        mainProcess.readAppFile('Mechanical Weather', 'Logs', 'WeatherLogs', 'json')
+        .then(newWeatherLogs => setWeatherLogs(generateWeatherLogs(newWeatherLogs, {
+                timeStampsList: [],
+                temperatureList: [],
+                humidityList: []
+        })))
+        .catch(error => console.log(error))
+    }, [weatherInfo]);
 
     useEffect(() => {
         if(chartRef && chartRef.current){
+            const initialChartConfig = getChartConfig(generateWeatherLogs(weatherLogs, {
+                timeStampsList: [],
+                temperatureList: [],
+                humidityList: []
+            }));
+
             if(weatherChart === null){
                 const newWeatherChart = new Chart(chartRef.current, initialChartConfig);
 
                 setWeatherChart(newWeatherChart);
             };
         };
-    },[chartRef, weatherChart]);
 
-    const updateChartTimeStamp = (newTimeStamp) => {
-        weatherChart.data.labels = newTimeStamp;
-    };
-
-    const updateChartDataset = (datasetIndex, newData) => {
-        weatherChart.data.datasets[datasetIndex].data = newData; 
-    };
-
-    const updateWeatherDatasets = (timeStampData, temperatureData, humidityData) => {
-        updateChartTimeStamp(timeStampData);
-
-        updateChartDataset(0, temperatureData);
-        updateChartDataset(1, humidityData);
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[]);
     
     useEffect(() => {
+        if(process.env.REACT_APP_ENVIRONMENT === 'production'){
+            setInterval(async () => {
+                const userInfo = JSON.parse(window.localStorage.getItem("userInfo")),
+                      userLocation = JSON.parse(window.localStorage.getItem("userLocation"));
+                
+                const userData = {
+                    userInfo: userInfo,
+                    userLocation: userLocation
+                };
+                
+                sendWeatherData(weatherLogs, userData)
+                .catch(error => console.log(error))
+            }, 300000);
+        };
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => { 
+        const updateChartTimeStamp = (newTimeStamp) => {
+            weatherChart.data.labels = newTimeStamp;
+        };
+    
+        const updateChartDataset = (datasetIndex, newData) => {
+            weatherChart.data.datasets[datasetIndex].data = newData; 
+        };
+    
+        const updateWeatherDatasets = (timeStampData, temperatureData, humidityData) => {
+            updateChartTimeStamp(timeStampData);
+    
+            updateChartDataset(0, temperatureData);
+            updateChartDataset(1, humidityData);
+        };
+
         if(weatherChart !== null){
             updateWeatherDatasets(weatherLogs.timeStampsList, weatherLogs.temperatureList, weatherLogs.humidityList);
 
             weatherChart.update();
-
-            (async () => {
-                if(!hasWeatherBeenSent){
-                    const userData = {
-                        userInfo: userInfo,
-                        userLocation: userLocation
-                    };
-                    
-                    sendWeatherData(hasWeatherBeenSent, weatherLogs, userData)
-                    .then(() => {
-                        if(hasWeatherBeenSent === false){
-                            hasWeatherBeenSent = true;
-                        };
-                    })
-                    .catch(error => console.log(error))
-                };
-            })();
         };
-    });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [weatherLogs]);
     
     return(
         <div className={classes.graphContainer}>
