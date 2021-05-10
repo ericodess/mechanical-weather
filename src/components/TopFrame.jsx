@@ -9,17 +9,17 @@ import {
     minusIcon
 } from '../assets/images/icons';
 
-const electron = window.require("electron");
+const remote = window.require('@electron/remote');
 
 const TopFrame = () => {
     const minimizeWindow = () => {
-        const window = electron.remote.getCurrentWindow();
+        const window = remote.getCurrentWindow();
 
         window.minimize();
     };
 
     const closeWindow = () => {
-        const window = electron.remote.getCurrentWindow();
+        const window = remote.getCurrentWindow();
 
         window.close();
     };
