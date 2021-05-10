@@ -1,4 +1,7 @@
-import React from 'react';
+import React, {
+    useEffect,
+    useState
+} from 'react';
 import {
     useSelector,
     useDispatch
@@ -29,26 +32,58 @@ import {
     updateUserLocation
 } from '../actions';
 
-const electron = window.require('electron');
+const remote = window.require('@electron/remote'),
+      SerialPort = remote.require('serialport');
 
 const Settings = (props) => {
     const dispatch = useDispatch();
 
     const state = useSelector(state => state),
-          portList = electron.ipcRenderer.sendSync('get-port-list'),
+          [portList, setPortList] = useState([]),
+          [portInfo, setPortInfo] = useState({}),
           currentPathname = props.location.pathname.split('/')[props.location.pathname.split('/').length - 1],
           resolutionList = ['1600x900', '1280x720'],
           selectedOption = currentPathname === 'port' ? state.portInfo.path : state.screenResolution.resolution;
-          
-    const generatePortList = () => {
+
+    const generatePortList = (currentPortList) => {
         const newPortList = [];
 
-        portList.forEach(port => {
+        currentPortList.forEach(port => {
             newPortList.push(port.path);
         });
 
         return newPortList;
     };
+
+    useEffect(() => {
+        (async () => {
+            await SerialPort.list()
+            .then((ports, err) => {
+                if(!err){
+                    setPortList(generatePortList(ports));
+                };
+            })
+        })();
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            if(portList.find(port => port === selectedOption)){
+                if(selectedOption){
+                    await SerialPort.list()
+                    .then((ports, err) => {
+                        if(!err){
+                            ports.forEach(port => {
+                                if(port.path === selectedOption){
+                                    setPortInfo(port);
+                                };
+                            });
+                        };
+                    })
+                };
+            };
+        })();
+    }, [portList, selectedOption]);
 
     const insertPortInfo = (option) => {
         const portInfo = portList.find(currentPort => currentPort.path === option);
@@ -61,20 +96,9 @@ const Settings = (props) => {
         return updatePortInfo(port);
     };
 
-    const fetchPortInfo = (portPath) => {
-        let portInfo = {},
-            netPortList = generatePortList();
-
-        if(netPortList.find(port => port === portPath)){
-            if(portPath){
-                portInfo = electron.ipcRenderer.sendSync('get-port-info', portPath);
-            };
-        };
-        
-        return portInfo;
-    };
-
     const insertScreenResolution = (option) => {
+        const mainProcess = remote.require('./electron.js');
+
         const splittedOption = option.split('x'),
               configurationPayload = {
                     displayResolution: {
@@ -83,7 +107,24 @@ const Settings = (props) => {
                     }
         };
         
-        electron.ipcRenderer.sendSync('generate-app-file', 'Config', 'ClientConfiguration', 'json', configurationPayload);
+        mainProcess.readAppFile('Mechanical Weather', 'Config', 'ClientConfiguration', 'json')
+        .then(payload => {
+            if(payload.displayResolution !== option){
+                const win = remote.getCurrentWindow(),
+                      splittedScreenResolution = splittedOption;
+    
+                win.setMinimumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                win.setMaximumSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                
+                win.setSize(parseInt(splittedScreenResolution[0]), parseInt(splittedScreenResolution[1]));
+                
+                win.center();
+    
+                window.localStorage.setItem("screenResolution", JSON.stringify({resolution: option}));
+
+                mainProcess.generateAppFile('Mechanical Weather', 'Config', 'ClientConfiguration', 'json', configurationPayload);
+            };
+        })
 
         return updateScreenResolution(option);
     };
@@ -132,13 +173,13 @@ const Settings = (props) => {
                 return(
                     <React.Fragment>
                         <DropdownList
-                            options={generatePortList()}
+                            options={portList}
                             action={insertPortInfo}
                             defaultValue="Selecione uma porta"
                             selectedOption={selectedOption}
                         />
                         <InfoDiplay
-                            info={fetchPortInfo(state.portInfo.path)}
+                            info={portInfo}
                             errorMessage="Escolha uma porta"
                         />
                     </React.Fragment>
