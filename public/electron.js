@@ -1,8 +1,9 @@
 const {
     app,
-    BrowserWindow,
-    ipcMain
+    BrowserWindow
 } = require('electron');
+
+require('@electron/remote/main').initialize();
 
 const fs = require('fs'),
       path = require('path'),
@@ -11,7 +12,8 @@ const fs = require('fs'),
 const generateAppFile = (appName, subDirectoryPath, fileName, fileExtension, payload) => {
     const currentSystem = process.platform,
           sanatizedSubSirectoryPath = filePathSanitizer(subDirectoryPath, ['\\','/']),
-          appFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\${sanatizedSubSirectoryPath}\\` : `${process.env.HOME}/${appName}/${sanatizedSubSirectoryPath}/`,
+          appFilePath = currentSystem === "win32" ? `${process.env.APPDATA}\\${appName}\\${sanatizedSubSirectoryPath}\\` : 
+                                                    `${process.env.HOME}/${appName}/${sanatizedSubSirectoryPath}/`,
           filePath = `${appFilePath}${fileName}.${filePathSanitizer(fileExtension.toLowerCase(),['.'])}`;
 
     if(!fs.existsSync(appFilePath)){
@@ -63,7 +65,7 @@ const filePathSanitizer = (filePath, targetList) => {
 const createWindow = async () => {
     let configPayload = {};
 
-    await readAppFile('MechanicalWeather', 'Config', 'ClientConfiguration', 'json')
+    await readAppFile('Mechanical Weather', 'Config', 'ClientConfiguration', 'json')
     .then(result => configPayload = result)
     
     const mainWindow = new BrowserWindow({
@@ -155,7 +157,6 @@ const generateWeatherStatus = (timestamp, temperature, humidity) => {
     return weather;
 };
 
-
 app.whenReady().then(() => {
     createWindow();
     
@@ -166,113 +167,32 @@ app.whenReady().then(() => {
     });
 });
 
-const SerialPort = require('serialport');
-
-ipcMain.on('get-port-list', async (event, arg) => {
-    await SerialPort.list()
-    .then((ports, err) => {
-        if(err){
-            event.returnValue = [];
-        }else{
-            event.returnValue = ports;
-        };
-    })
-    .catch(error => {
-        event.returnValue = [];
-    })
-});
-
-ipcMain.on('get-port-info', async (event, portPath) => {
-    await SerialPort.list()
-    .then((ports, err) => {
-        if(err){
-            event.returnValue = {};
-        }else{   
-            ports.forEach(port => {
-                if(port.path === portPath){
-                    event.returnValue = port;
-                };
-            });
-        };
-    })
-    .catch(() => {
-        event.returnValue = {};
-    })
-});
-
-ipcMain.on('get-weather-info', async (event, portPath) => {
-    if(portPath){
-        const port = new SerialPort(portPath, {
-            autoOpen: false,
-            baudRate: 9600
-        }),
-            parser = port.pipe(new SerialPort.parsers.Readline({ delimiter: '\r\n' }));
-
-        port.open((error) => {
-            if(error){
-                event.returnValue = {
-                    weatherType: "unknown"
-                };   
-            }else{
-                parser.on('data', async (data) => {
-                    const serialData = JSON.parse(data);
-
-                    let payload = {
-                        timeStamp: Date.now(),
-                        weatherInfo: serialData
-                    },
-                        weatherLog;
-
-                    await readAppFile('MechanicalWeather', 'Logs', 'WeatherLogs', 'json')
-                    .then(result => weatherLog = result)
-                    
-                    if(weatherLog === -1){
-                        payload = [payload];
-                    }else{
-                        const newWeatherLog = weatherLog;
-                        
-                        while(newWeatherLog.length >= 14){
-                            newWeatherLog.shift();
-                        };
-
-                        newWeatherLog.push(payload);
-
-                        payload = weatherLog;
-                    };
-
-                    generateAppFile('MechanicalWeather', 'Logs', 'WeatherLogs', 'json', payload);
-
-                    event.returnValue = {
-                        weatherType: generateWeatherStatus(Date.now(), serialData.temperature, serialData.humidity),
-                        weatherInfo: {
-                            temperature: serialData.temperature,
-                            humidity: serialData.humidity
-                        }
-                    };
-                });   
-            };
-        });
-    }else{
-        event.returnValue = {
-            weatherType: "unknown"
-        };
-    };
-});
-
-ipcMain.on('generate-app-file', (event, subDirectoryPath, fileName, fileExtension, payload) => {
-    generateAppFile('MechanicalWeather', subDirectoryPath, fileName, fileExtension, payload);
-
-    event.returnValue = true;
-});
-
-ipcMain.on('read-app-file', async (event, subDirectoryPath, fileName, fileExtension) => {
-    readAppFile('MechanicalWeather', subDirectoryPath, fileName, fileExtension)
-    .then(result => event.returnValue = result)
-    .catch(() => event.returnValue = [])
-});
-
 app.on('window-all-closed', () => {
     if(process.platform !== 'darwin'){
         app.quit();
     };
 });
+
+exports.readAppFile = async (appName, subDirectoryPath, fileName, fileExtension) => {
+    let appFilePayload = [];
+
+    await readAppFile(appName, subDirectoryPath, fileName, fileExtension)
+    .then(result => appFilePayload = result)
+    .catch(() => appFilePayload = [])
+
+    return appFilePayload;
+};
+
+exports.generateAppFile = (appName, subDirectoryPath, fileName, fileExtension, payload) => {
+    return new Promise((resolve, reject) => {
+        try{
+            resolve(generateAppFile(appName, subDirectoryPath, fileName, fileExtension, payload));
+        }catch(error){
+            reject(error);
+        };
+    })
+};
+
+exports.generateWeatherStatus = (currentTimeStamp, currentTemperature, currentHumidity) => {
+    return generateWeatherStatus(currentTimeStamp, currentTemperature, currentHumidity);
+};
