@@ -60,7 +60,7 @@ const Settings = (props) => {
             await SerialPort.list()
             .then((ports, err) => {
                 if(!err){
-                    setPortList(generatePortList(ports));
+                    setPortList(ports);
                 };
             })
         })();
@@ -88,7 +88,7 @@ const Settings = (props) => {
     const insertPortInfo = (option) => {
         const portInfo = portList.find(currentPort => currentPort.path === option);
         let port = {};
-
+        console.log(portInfo)
         if(typeof portInfo === 'object'){
             port = portInfo;
         };
@@ -173,7 +173,7 @@ const Settings = (props) => {
                 return(
                     <React.Fragment>
                         <DropdownList
-                            options={portList}
+                            options={generatePortList(portList)}
                             action={insertPortInfo}
                             defaultValue="Selecione uma porta"
                             selectedOption={selectedOption}
