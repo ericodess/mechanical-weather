@@ -45,14 +45,15 @@
     }
     .text-input{
         font-size: 2vh;
-        height: 5vh;
+        height: 6.5vh;
         margin: 12vh 0 0 0;
         
         &__input{
             border-top-left-radius: 1.5vh;
             border-bottom-left-radius: 1.5vh;
             width: 45vh;
-            padding: 0 1vh;
+            height: 4vh;
+            padding: 2vh 1.3vh .5vh 1.3vh;
             font-size: 2vh;
         }
         &__button{
@@ -76,8 +77,8 @@
             margin: 0 0 0 1vh;
         }
         &__input:focus + &__label, &__input:not(:focus):valid + &__label{
-            font-size: 1.8vh;
-            margin: -5vh 0 0 1.5vh;
+            font-size: 1.5vh;
+            margin: -4vh 0 0 1.5vh;
         }
     }
 }
