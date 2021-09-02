@@ -1,7 +1,7 @@
 {
   "name": "mechanical-weather",
   "description": "React/Electron app using Arduino's serial weather data ",
-  "author": "Pepeyen",
+  "author": "Erick Frederick Caldeira",
   "version": "1.2.0",
   "private": true,
   "build": {
