@@ -1,4 +1,4 @@
-[![mechanical-weather](https://raw.githubusercontent.com/ericodesu/mechanical-weather/master/.github/images/project-thumbnail.png)](https://github.com/ericodesu/mechanical-weather)
+[![mechanical-weather](.github/images/project-thumbnail.png)](https://github.com/pepeien/mechanical-weather/releases/latest)
 
 # Getting Started with Create React App
 
